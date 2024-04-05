@@ -7,6 +7,10 @@ on:
 
   pull_request:
 
+env:
+  MONTA_USERNAME: ${{ secrets.MONTA_USERNAME }}
+  MONTA_PASSWORD: ${{ secrets.MONTA_PASSWORD }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
