@@ -23,7 +23,34 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Client
+
+On Monta dashboard, first connect to Monta's REST API and then add a new connection to get your
+username and password
+
+```ruby
+client = MontaAPI::Client.new(username: monta_username, password: monta_password)
+```
+
+### Return
+
+#### 1. Retrieve returns that were updated since a date
+
+```ruby
+client.return.where(since: "2024-04-05")
+
+# => returns an array of MontaAPI::Return objects
+```
+
+### Return Forecast
+
+#### 1. Retrieve a ReturnForecast by code
+
+```ruby
+client.return_forecast.find_by(code: "2")
+
+# => returns a MontaAPI::ReturnForecast object
+```
 
 ## Development
 
