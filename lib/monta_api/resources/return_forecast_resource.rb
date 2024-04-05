@@ -51,6 +51,18 @@ module MontaAPI
     #   "GeneralComment": null
     # }
     def create
+      # Pending
+    end
+
+    # @client.return_forecast.generate_label(code:)
+    # Response:
+    # {
+    #   "EncodedData": "base64 string",
+    #   "FileExtension": "pdf",
+    #   "TrackAndTraceLink": "https://tracking.dpd.de/parcelstatus?query=05212012021346&locale=nl_NL"
+    # }
+    def generate_label
+      # Pending
     end
   end
 end

@@ -39,5 +39,9 @@ module MontaAPI
 
       response_body["Returns"].map { |attributes| Return.new(attributes) }
     end
+
+    def update
+      # Update the follow up actions per Return Line
+    end
   end
 end
