@@ -8,14 +8,52 @@ RSpec.describe MontaAPI::ReturnResource do
   end
 
   describe "#where(since:, status: 'any')" do
+    let!(:updated_since) { "2024-04-05" }
+    let!(:response_body) do
+      {
+        "Returns": [
+          {
+            "Id": 3_873_210,
+            "CreatedAt": "2024-04-05T08:40:40.327",
+            "Comment": nil,
+            "Cause": "Ik ben van gedachten veranderd",
+            "WebshopCause": nil,
+            "WebshopOrderId": "1173",
+            "Lines": [
+              {
+                "WebshopOrderLineId": "14638817116463",
+                "Sku": "ABC",
+                "ReturnedQuantity": 1,
+                "Sellable": true,
+                "FollowedUpMontapacking": false,
+                "FollowedUpCustomer": false,
+                "FollowedUpAction": nil,
+                "Cause": "Ik ben van gedachten veranderd",
+                "Comment": nil,
+                "BatchCode": nil
+              }
+            ],
+            "UpdatedAt": "2024-04-05T08:41:33.81",
+            "SerialNumbers": [],
+            "ReturnForecastId": 2_361_500,
+            "ForecastCode": "2"
+          }
+        ]
+      }
+    end
+
+    before do
+      stub_request(:get, "#{MontaAPI::Client::BASE_URL}return/updated_since/#{updated_since}?status=any")
+        .with(query: { status: "any" }, basic_auth: [ENV["MONTA_USERNAME"], ENV["MONTA_PASSWORD"]])
+        .to_return_json(body: response_body, status: 200)
+    end
+
     it do
-      VCR.use_cassette("return_where") do
-        returns = subject.where(since: "2024-04-05")
-        expect(returns.count).to eq(1)
-        expect(returns.map(&:id)).to eq([3_873_210])
-        expect(returns.map(&:forecast_code)).to eq(["2"])
-        expect(returns.map(&:webshop_order_id)).to eq(["1173"])
-      end
+      returns = subject.where(since: updated_since)
+      expect(returns.count).to eq(1)
+      expect(returns.map(&:id)).to eq([3_873_210])
+      expect(returns.map(&:forecast_code)).to eq(["2"])
+      expect(returns.map(&:webshop_order_id)).to eq(["1173"])
     end
   end
 end

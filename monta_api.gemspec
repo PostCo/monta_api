@@ -34,10 +34,11 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
 
   spec.add_development_dependency("dotenv", "~> 2.1")
+  spec.add_development_dependency("pry", "~> 0.14.2")
   spec.add_development_dependency("rubocop", "~> 1.62")
+  spec.add_development_dependency("webmock", "~> 3.23.0")
+
   spec.add_dependency "activesupport", "~> 7.0"
   spec.add_dependency "faraday", "~> 2.5"
   spec.add_dependency "zeitwerk", "~> 2.6"
-  spec.add_development_dependency("pry", "~> 0.14.2")
-  spec.add_development_dependency("vcr", "~> 6.2.0")
 end

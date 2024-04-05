@@ -3,13 +3,7 @@
 require "monta_api"
 require "pry"
 require "dotenv/load"
-require "vcr"
-
-VCR.configure do |config|
-  config.cassette_library_dir = "spec/vcr_cassettes"
-  config.hook_into :faraday
-  config.allow_http_connections_when_no_cassette = true
-end
+require "webmock/rspec"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
