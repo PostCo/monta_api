@@ -50,8 +50,10 @@ module MontaAPI
     #   "TrackAndTraceLink": null,
     #   "GeneralComment": null
     # }
-    def create
-      # Pending
+    def create(attributes)
+      response_body = post_request("returnforecast", body: attributes).body
+
+      ReturnForecast.new(response_body)
     end
 
     # @client.return_forecast.generate_label(code:)
