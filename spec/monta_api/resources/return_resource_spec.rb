@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe MontaAPI::ReturnResource do
+RSpec.describe MontaAPI::ReturnResource, type: :request do
   subject { described_class.new(client) }
 
   let!(:client) do
@@ -54,6 +54,53 @@ RSpec.describe MontaAPI::ReturnResource do
       expect(returns.map(&:id)).to eq([3_873_210])
       expect(returns.map(&:forecast_code)).to eq(["2"])
       expect(returns.map(&:webshop_order_id)).to eq(["1173"])
+    end
+  end
+
+  describe "#follow_up(return_id:, attributes: 'any')" do
+    let!(:return_id) { 1 }
+
+    context "when follow up successfully" do
+      let!(:attributes) do
+        [{ "LineId" => 123, "Status" => "Refunded" }, { "LineId" => 234, "Status" => "NewOrderCreated" }]
+      end
+
+      before do
+        stub_request(:put, "#{MontaAPI::Client::BASE_URL}return/#{return_id}/update_return_status/multiple_lines")
+          .with(body: attributes, basic_auth: [ENV["MONTA_USERNAME"], ENV["MONTA_PASSWORD"]])
+          .to_return(body: "Successfully changed the statuses of multiple ReturnLines", status: 200)
+      end
+
+      it do
+        result = subject.follow_up(return_id: return_id, attributes: attributes)
+
+        expect(result).to eq("Successfully changed the statuses of multiple ReturnLines")
+      end
+    end
+
+    context "when failed to follow up" do
+      let!(:attributes) do
+        [{ "LineId" => 123, "Status" => "Invalid status" }, { "LineId" => 234, "Status" => "Invalid status" }]
+      end
+      let!(:response_body) do
+        {
+          "ErrorMessage": "An error occurred when updating the status of a/multiple line(s). The statuses were not updated.",
+          "InvalidReasons": [
+            "The newly chosen return status 'wrong' is invalid. Make sure to use a valid status.",
+            "The newly chosen return status 'wrong' is invalid. Make sure to use a valid status."
+          ]
+        }
+      end
+
+      before do
+        stub_request(:put, "#{MontaAPI::Client::BASE_URL}return/#{return_id}/update_return_status/multiple_lines")
+          .with(body: attributes, basic_auth: [ENV["MONTA_USERNAME"], ENV["MONTA_PASSWORD"]])
+          .to_return_json(body: response_body, status: 400)
+      end
+
+      it do
+        expect { subject.follow_up(return_id: return_id, attributes: attributes) }.to raise_error(MontaAPI::Error)
+      end
     end
   end
 end

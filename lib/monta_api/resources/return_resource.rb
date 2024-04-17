@@ -40,8 +40,13 @@ module MontaAPI
       response_body["Returns"].map { |attributes| Return.new(attributes) }
     end
 
-    def update
-      # Update the follow up actions per Return Line
+    # Attributes:
+    #   [{ "LineId" => 123, "Status" => "Refunded" }, { "LineId" => 234, "Status" => "NewOrderCreated" }]
+    #
+    # Response:
+    #   "Successfully changed the statuses of multiple ReturnLines"
+    def follow_up(return_id:, attributes:)
+      put_request("return/#{return_id}/update_return_status/multiple_lines", body: attributes).body
     end
   end
 end
