@@ -109,4 +109,59 @@ RSpec.describe MontaAPI::ReturnForecastResource do
       end
     end
   end
+
+  describe "#generate_label(forecast_code:, shipper_code:)" do
+    context "when label genarated successfully" do
+      let!(:forecast_code) { "MP1" }
+      let!(:shipper_code) { "DPD" }
+      let!(:encoded_data) { "abcdefgh" }
+      let!(:track_and_trace_link) { "https://track-and-trace.com" }
+      let!(:response_body) do
+        {
+          "EncodedData": encoded_data,
+          "FileExtension": "pdf",
+          "TrackAndTraceLink": track_and_trace_link
+        }
+      end
+
+      before do
+        stub_request(:get, "#{MontaAPI::Client::BASE_URL}returnforecast/#{forecast_code}/returnlabel")
+          .with(query: { shipperCode: shipper_code }, basic_auth: basic_auth)
+          .to_return_json(status: 200, body: response_body)
+      end
+
+      it do
+        return_label = subject.generate_label(forecast_code: forecast_code, shipper_code: shipper_code)
+        expect(return_label.encoded_data).to eq(encoded_data)
+        expect(return_label.file_extension).to eq("pdf")
+        expect(return_label.track_and_trace_link).to eq(track_and_trace_link)
+      end
+    end
+
+    context "when failed to generate label" do
+      let!(:forecast_code) { "MP1" }
+      let!(:shipper_code) { "DPD" }
+      let!(:encoded_data) { "abcdefgh" }
+      let!(:track_and_trace_link) { "https://track-and-trace.com" }
+      let!(:response_body) do
+        {
+          "EncodedData": encoded_data,
+          "FileExtension": "pdf",
+          "TrackAndTraceLink": track_and_trace_link
+        }
+      end
+
+      before do
+        stub_request(:get, "#{MontaAPI::Client::BASE_URL}returnforecast/#{forecast_code}/returnlabel")
+          .with(query: { shipperCode: shipper_code }, basic_auth: basic_auth)
+          .to_return(status: 400, body: "shipper not allowed")
+      end
+
+      it do
+        expect do
+          subject.generate_label(forecast_code: forecast_code, shipper_code: shipper_code)
+        end.to raise_error(MontaAPI::Error)
+      end
+    end
+  end
 end

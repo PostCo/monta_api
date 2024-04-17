@@ -63,8 +63,12 @@ module MontaAPI
     #   "FileExtension": "pdf",
     #   "TrackAndTraceLink": "https://tracking.dpd.de/parcelstatus?query=05212012021346&locale=nl_NL"
     # }
-    def generate_label
-      # Pending
+    def generate_label(forecast_code:, shipper_code:)
+      response_body = get_request(
+        "returnforecast/#{forecast_code}/returnlabel", params: { shipperCode: shipper_code }
+      ).body
+
+      ReturnLabel.new(response_body)
     end
   end
 end

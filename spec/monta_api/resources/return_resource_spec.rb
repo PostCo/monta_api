@@ -43,7 +43,7 @@ RSpec.describe MontaAPI::ReturnResource do
     end
 
     before do
-      stub_request(:get, "#{MontaAPI::Client::BASE_URL}return/updated_since/#{updated_since}?status=any")
+      stub_request(:get, "#{MontaAPI::Client::BASE_URL}return/updated_since/#{updated_since}")
         .with(query: { status: "any" }, basic_auth: [ENV["MONTA_USERNAME"], ENV["MONTA_PASSWORD"]])
         .to_return_json(body: response_body, status: 200)
     end
