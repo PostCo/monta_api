@@ -22,6 +22,10 @@ module MontaAPI
       ReturnForecastResource.new(self)
     end
 
+    def return_reason
+      ReturnReasonResource.new(self)
+    end
+
     def connection
       @connection ||= Faraday.new do |conn|
         conn.url_prefix = BASE_URL
