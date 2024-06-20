@@ -57,7 +57,7 @@ RSpec.describe MontaAPI::ReturnResource, type: :request do
     end
   end
 
-  describe "#follow_up(return_id:, attributes: 'any')" do
+  describe "#follow_up_multiple_lines(return_id:, attributes: 'any')" do
     let!(:return_id) { 1 }
 
     context "when follow up successfully" do
@@ -72,7 +72,7 @@ RSpec.describe MontaAPI::ReturnResource, type: :request do
       end
 
       it do
-        result = subject.follow_up(return_id: return_id, attributes: attributes)
+        result = subject.follow_up_multiple_lines(return_id: return_id, attributes: attributes)
 
         expect(result).to eq("Successfully changed the statuses of multiple ReturnLines")
       end
@@ -99,7 +99,43 @@ RSpec.describe MontaAPI::ReturnResource, type: :request do
       end
 
       it do
-        expect { subject.follow_up(return_id: return_id, attributes: attributes) }.to raise_error(MontaAPI::Error)
+        expect do
+          subject.follow_up_multiple_lines(return_id: return_id, attributes: attributes)
+        end.to raise_error(MontaAPI::Error)
+      end
+    end
+  end
+
+  describe "#follow_up(return_id:, status:)" do
+    let(:return_id) { 1 }
+    let(:status) { "Refunded" }
+
+    context "when follow up successfully" do
+      let(:response_body) { "Successfully changed status of return '#{return_id}' from 'none' to '#{status}'." }
+
+      before do
+        stub_request(:put, "#{MontaAPI::Client::BASE_URL}return/#{return_id}/update_return_status/#{status}")
+          .with(basic_auth: [ENV["MONTA_USERNAME"], ENV["MONTA_PASSWORD"]])
+          .to_return(body: response_body, status: 200)
+      end
+
+      it do
+        result = subject.follow_up(return_id: return_id, status: status)
+        expect(result).to eq(response_body)
+      end
+    end
+
+    context "when failed to follow up" do
+      let(:response_body) { "Fail to follow up return" }
+
+      before do
+        stub_request(:put, "#{MontaAPI::Client::BASE_URL}return/#{return_id}/update_return_status/#{status}")
+          .with(basic_auth: [ENV["MONTA_USERNAME"], ENV["MONTA_PASSWORD"]])
+          .to_return(body: response_body, status: 400)
+      end
+
+      it do
+        expect { subject.follow_up(return_id: return_id, status: status) }.to raise_error(MontaAPI::Error)
       end
     end
   end

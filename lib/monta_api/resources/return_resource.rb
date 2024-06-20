@@ -45,8 +45,15 @@ module MontaAPI
     #
     # Response:
     #   "Successfully changed the statuses of multiple ReturnLines"
-    def follow_up(return_id:, attributes:)
+    def follow_up_multiple_lines(return_id:, attributes:)
       put_request("return/#{return_id}/update_return_status/multiple_lines", body: attributes).body
+    end
+
+    # @client.return.follow_up(return_id: "123456", status: "Refunded")
+    # Response:
+    #   "Successfully changed status of return '123456' from 'none' to 'Refunded'."
+    def follow_up(return_id:, status:)
+      put_request("return/#{return_id}/update_return_status/#{status}", body: {}).body
     end
   end
 end
